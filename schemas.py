@@ -1,50 +1,60 @@
-from email.policy import default
 from typing import List, Optional
-import ormar
-from configs.database import database, metadata
+from pydantic import BaseModel, Field, validator
+from security import criacao, verificacao
 
-class Usuario(ormar.Model):
-    class Meta:
-        metadata = metadata
-        database = database
-        tablename = 'Usuario'
+
+class UsuarioResponse(BaseModel):
+    id: int
+    nome: str
+    email: str
     
-    id: int = ormar.Integer(primary_key=True)
-    nome: str = ormar.String(max_length=70)
-    email: str = ormar.String(max_length=15, unique=True)
-    meus_produtos: List[Produto] = ormar.ManyToMany(Produto)
-    minhas_vendas: List[Pedido] = ormar.ManyToMany(Pedido)
-    meus_pedidos: List[Pedido] = ormar.ManyToMany(Pedido)
+class UsuarioPatch(BaseModel):
+    nome: Optional[str]
+    email: Optional[str]
+    hash_password: Optional[str] = Field(alias='senha')
+    
+    @validator('hash_password', pre=True)
+    def hash_senha_create(cls, v):
+        return criacao(v)
 
 
-class Produto(BaseModel):
-    class Meta:
-        metadata = metadata
-        database = database
-        tablename = 'Produto'
+class UsuarioCreate(BaseModel):
+    nome: str
+    email: str
+    hash_password: str = Field(alias='senha')
+    
+    @validator('hash_password', pre=True)
+    def hash_senha_create(cls, v):
+        return criacao(v)
+
+class UsuarioVerify(BaseModel):
+    email: str
+    senha: str
+    
+    @validator("senha",pre=True)
+    def hash_senha_verify(cls, v):
+        return verificacao(v)
         
-    id: int = ormar.Integer(primary_key=True,autoincrement=True)
-    usuario: Usuario = ormar.ForeignKey(Usuario)
-    nome: str = ormar.String(max_length=30)
-    detalhes: str = ormar.String(max_length=60)
-    preco: float = ormar.Float()
-    disponivel: bool = ormar.Boolean(default=False)
-    
 
-class Pedido(BaseModel):
-    class Meta:
-        metadata = metadata
-        database = database
-        tablename = 'Pedido'
-        
-    id: int = ormar.Integer(primary_key=True,autoincrement=True)
-    usuario: Usuario = ormar.ForeignKey(Usuario)
-    produto: Produto = ormar.ForeignKey(Produto)
-    quantidade: int = ormar.Integer()
-    entrega: bool = ormar.Boolean(default=False)
-    endereco: str = ormar.String(max_length=40)
-    obs: Optional[str] = ormar.String(max_length=90,default="Sem observação")
+class ProdutoSCHM(BaseModel):
+    id: int
+    usuario: int
+    nome: str 
+    detalhes: str 
+    preco: float 
+    disponivel: bool
+    
+class ProdutoSCHMPatch(BaseModel):
+    nome:Optional[str] = None
+    detalhes:Optional[str] = None
+    preco: Optional[float] = None
+    disponivel: Optional[bool] = None
     
     
-    
-    
+class PedidosSCHM(BaseModel):
+    id: int
+    usuario: int
+    quantidade: int
+    entrega: bool
+    endereco: str
+    obs: Optional[str]
