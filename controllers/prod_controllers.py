@@ -7,11 +7,11 @@ from schemas import ProdutoSCHMPatch
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/",tags=["Produtos"])
 async def view_list():
     return {"Produtos":await Produto.objects.all()}
 
-@router.get("/{id}")
+@router.get("/{id}",tags=["Produtos"])
 async def view(id: int,response:Response):
     try:
         return await Produto.objects.get(id=id)
@@ -20,7 +20,7 @@ async def view(id: int,response:Response):
         return {"Error":"Produto Não encontrado"}
 
 
-@router.patch("/{id}")
+@router.patch("/{id}",tags=["Produtos"])
 async def update(id: int,produto:ProdutoSCHMPatch,response:Response):
     try:
         produto_get = await Produto.objects.get(id=id)
@@ -33,12 +33,12 @@ async def update(id: int,produto:ProdutoSCHMPatch,response:Response):
         return {"Error":"Produto Não encontrado"}
     
 
-@router.post("/")
+@router.post("/",tags=["Produtos"])
 async def create(produto:Produto):
     return await produto.save()
 
 
-@router.delete("/{id}")
+@router.delete("/{id}",tags=["Produtos"])
 async def view(id: int,response: Response):
     try:
         response.status_code = status.HTTP_204_NO_CONTENT

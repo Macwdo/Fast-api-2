@@ -7,6 +7,7 @@ class UsuarioResponse(BaseModel):
     id: int
     nome: str
     email: str
+    cargos: List[str]
     
 class UsuarioPatch(BaseModel):
     nome: Optional[str]
