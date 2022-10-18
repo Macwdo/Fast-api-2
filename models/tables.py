@@ -2,7 +2,7 @@
 # import ormar
 # from schemas import PedidosSCHM, UsuarioSCH, ProdutoSCHM
 # from configs.database import database, metadata
-
+#
 # class Usuario(ormar.Model):
 #     class Meta:
 #         metadata = metadata
