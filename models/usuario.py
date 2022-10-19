@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 from typing import List
 import ormar
 import re
@@ -17,6 +18,8 @@ class Usuario(ormar.Model):
     email: str = ormar.String(max_length=100, unique=True)
     hash_password: str = ormar.String(max_length=255)
     cargos: Json = ormar.JSON(default=[])
+    vendas : Json = ormar.JSON(default=[])
+
 
 
     @validator('email')
@@ -37,4 +40,19 @@ class Usuario(ormar.Model):
     @validator('cargos')
     def valida_cargos_duplicados(cls,v):
         return list(set(v))
+    
+    @validator('vendas')
+    def valida_vendas(cls,v):
+        if not isinstance(v,list):
+            raise ValueError("Dever ser uma lista")
+        for venda in v:
+            if venda not in v:
+                raise ValueError("O valor não existe")
+        return v
+    
+    @validator('vendas')
+    def valida_vendas_dupli(cls,v):
+        return list(set(v))
+        
+                
 

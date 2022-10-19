@@ -2,7 +2,8 @@ from typing import List, Optional
 from models.prod import Produto
 from fastapi import APIRouter, status, Response,HTTPException
 import ormar.exceptions
-from schemas import ProdutoSCHMPatch
+from models.usuario import Usuario
+from schemas import ProdutoSCHM, ProdutoSCHMPatch
 
 router = APIRouter()
 
@@ -34,8 +35,15 @@ async def update(id: int,produto:ProdutoSCHMPatch,response:Response):
     
 
 @router.post("/",tags=["Produtos"])
-async def create(produto:Produto):
-    return await produto.save()
+async def create(produto:ProdutoSCHM):
+    prod = produto.dict()
+    print(prod)
+    criar = Produto.objects.create(**prod)
+    last = await Produto.objects.all()
+    user = await Usuario.objects.get_or_none(id=prod.get('vendedor'))
+    user.vendas += [int(last[-1].id)]
+    await user.update()
+    return ProdutoSCHM
 
 
 @router.delete("/{id}",tags=["Produtos"])

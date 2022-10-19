@@ -1,5 +1,5 @@
-from typing import List, Optional
-from pydantic import BaseModel, Field, validator
+from typing import List, Optional, Union
+from pydantic import BaseModel, Field, Json, validator
 from security import criacao, verificacao
 
 
@@ -8,6 +8,7 @@ class UsuarioResponse(BaseModel):
     nome: str
     email: str
     cargos: List[str]
+    vendas: List[str]
     
 class UsuarioPatch(BaseModel):
     nome: Optional[str]
@@ -38,9 +39,8 @@ class UsuarioVerify(BaseModel):
         
 
 class ProdutoSCHM(BaseModel):
-    id: int
-    usuario: int
     nome: str 
+    vendedor: int
     detalhes: str 
     preco: float 
     disponivel: bool
